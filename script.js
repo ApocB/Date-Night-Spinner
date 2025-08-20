@@ -1,19 +1,19 @@
 const wheels = {
   activity: {
     options: ["🍿 Movie Night","🎲 Board Games","🌌 Stargazing","🎤 Karaoke","🎮 Video Games","🧑‍🍳 Cook Together"],
-    riggedOptions: ["🌌 Stargazing","🍿 Movie Night"],
+    riggedOptions: ["🍿 Movie Night"],
     riggedMode: true,
     rotation: 0
   },
   dinner: {
     options: ["🍝 Italian","🍣 Sushi","🥩 Steakhouse","🌮 Mexican","🍕 Pizza","🥗 Healthy Bowls"],
-    riggedOptions: ["🍣 Sushi","🍝 Italian"],
+    riggedOptions: ["🍣 Sushi"],
     riggedMode: true,
     rotation: 0
   },
   outfits: {
     options: ["👕 Casual","👔 Dressy","🎽 Sporty","👗 Fancy","🧥 Cozy","😎 Themed"],
-    riggedOptions: ["👗 Fancy","👔 Dressy"],
+    riggedOptions: ["👗 Fancy"],
     riggedMode: true,
     rotation: 0
   }
