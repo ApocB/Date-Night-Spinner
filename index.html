@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Romantic Date Night Spinner</title>
+
+<style>
+
+  body {
+
+    background: radial-gradient(circle at center, #2b0a16 40%, #1a0610 100%);
+
+    color: #fff0f5;
+
+    font-family: 'Trebuchet MS', sans-serif;
+
+    text-align: center;
+
+    padding: 40px 10px;
+
+  }
+
+
+
+  h1 {
+
+    margin-bottom: 30px;
+
+    font-size: 2.5em;
+
+    color: #ffccd5;
+
+    text-shadow: 2px 2px 12px #000;
+
+  }
+
+
+
+  .wheel-container {
+
+    display: inline-block;
+
+    margin: 20px;
+
+    position: relative;
+
+    text-align: center;
+
+  }
+
+
+
+  .wheel-title {
+
+    margin-bottom: 15px;
+
+    font-size: 1.4em;
+
+    color: #ffd6e0;
+
+    font-weight: bold;
+
+  }
+
+
+
+  .wheel {
+
+    width: 300px;
+
+    height: 300px;
+
+    border-radius: 50%;
+
+    border: 10px solid #ff99aa;
+
+    position: relative;
+
+    overflow: hidden;
+
+    transition: transform 5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+
+    box-shadow: 0 0 30px rgba(255,192,203,0.6);
+
+    margin: 0 auto;
+
+  }
+
+
+
+  .segment {
+
+    position: absolute;
+
+    width: 50%;
+
+    height: 50%;
+
+    transform-origin: 100% 100%;
+
+    border: 1px solid #330a16;
+
+    text-align: center;
+
+    line-height: 1;
+
+    font-size: 14px;
+
+    color: #fff;
+
+    font-weight: bold;
+
+  }
+
+
+
+  .segment span {
+
+    position: absolute;
+
+    left: 115%;
+
+    top: 40%;
+
+    transform: translate(-50%, -50%) rotate(0deg);
+
+    width: 110px;
+
+  }
+
+
+
+  /* Heart pointer */
+
+  .pointer {
+
+    width: 30px;
+
+    height: 30px;
+
+    background: crimson;
+
+    position: absolute;
+
+    top: -60px;
+
+    left: 50%;
+
+    transform: translateX(-50%) rotate(45deg);
+
+    z-index: 10;
+
+    box-shadow: 0 0 12px rgba(255,0,64,0.7);
+
+  }
+
+  .pointer:before,
+
+  .pointer:after {
+
+    content: "";
+
+    width: 30px;
+
+    height: 30px;
+
+    background: crimson;
+
+    border-radius: 50%;
+
+    position: absolute;
+
+  }
+
+  .pointer:before {
+
+    top: -15px;
+
+    left: 0;
+
+  }
+
+  .pointer:after {
+
+    left: -15px;
+
+    top: 0;
+
+  }
+
+
+
+  .spin-btn {
+
+    margin-top: 20px;
+
+    padding: 10px 18px;
+
+    font-size: 16px;
+
+    background: linear-gradient(145deg, #ff6680, #cc3360);
+
+    color: #fff;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 12px rgba(0,0,0,0.6);
+
+    transition: 0.3s;
+
+  }
+
+
+
+  .spin-btn:hover {
+
+    background: linear-gradient(145deg, #ff7f95, #e64572);
+
+  }
+
+
+
+  #spinAll {
+
+    margin-top: 40px;
+
+    font-size: 18px;
+
+    padding: 12px 24px;
+
+    background: linear-gradient(145deg, #ff99aa, #ff6680);
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+  }
+
+
+
+  .result {
+
+    margin-top: 15px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    color: #ffd6e0;
+
+  }
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<h1>💖 Romantic Date Night Spinner 💖</h1>
+
+
+
+<div class="wheel-container">
+
+  <div class="wheel-title">🎲 Date Activity</div>
+
+  <div class="pointer"></div>
+
+  <div class="wheel" id="wheel-activity"></div>
+
+  <button class="spin-btn" onclick="spin('activity')">Spin Activity</button>
+
+  <div class="result" id="result-activity"></div>
+
+</div>
+
+
+
+<div class="wheel-container">
+
+  <div class="wheel-title">🍽️ Date Dinner</div>
+
+  <div class="pointer"></div>
+
+  <div class="wheel" id="wheel-dinner"></div>
+
+  <button class="spin-btn" onclick="spin('dinner')">Spin Dinner</button>
+
+  <div class="result" id="result-dinner"></div>
+
+</div>
+
+
+
+<div class="wheel-container">
+
+  <div class="wheel-title">👗 Date Outfits</div>
+
+  <div class="pointer"></div>
+
+  <div class="wheel" id="wheel-outfits"></div>
+
+  <button class="spin-btn" onclick="spin('outfits')">Spin Outfits</button>
+
+  <div class="result" id="result-outfits"></div>
+
+</div>
+
+
+
+<button id="spinAll" class="spin-btn" onclick="spinAll()">💞 Spin All 💞</button>
+
+
+
+<script>
+
+// Wheels setup
+
+const wheels = {
+
+  activity: {
+
+    options: [
+
+      "🍿 Movie Night",
+
+      "🎲 Board Games",
+
+      "🌌 Stargazing",
+
+      "🎤 Karaoke",
+
+      "🎮 Video Games",
+
+      "🧑‍🍳 Cook Together"
+
+    ],
+
+    riggedOptions: ["🌌 Stargazing", "🍿 Movie Night"],
+
+    riggedMode: true
+
+  },
+
+  dinner: {
+
+    options: [
+
+      "🍝 Italian",
+
+      "🍣 Sushi",
+
+      "🥩 Steakhouse",
+
+      "🌮 Mexican",
+
+      "🍕 Pizza",
+
+      "🥗 Healthy Bowls"
+
+    ],
+
+    riggedOptions: ["🍣 Sushi", "🍝 Italian"],
+
+    riggedMode: true
+
+  },
+
+  outfits: {
+
+    options: [
+
+      "👕 Casual",
+
+      "👔 Dressy",
+
+      "🎽 Sporty",
+
+      "👗 Fancy",
+
+      "🧥 Cozy",
+
+      "😎 Themed"
+
+    ],
+
+    riggedOptions: ["👗 Fancy", "👔 Dressy"],
+
+    riggedMode: true
+
+  }
+
+};
+
+
+
+// Build wheel segments
+
+Object.keys(wheels).forEach(key => {
+
+  const wheelElem = document.getElementById("wheel-" + key);
+
+  const opts = wheels[key].options;
+
+  opts.forEach((opt, i) => {
+
+    const seg = document.createElement("div");
+
+    seg.className = "segment";
+
+    seg.style.background = i % 2 ? "#cc3360" : "#ff6680";
+
+    seg.style.transform = `rotate(${(360 / opts.length) * i}deg) skewY(${90 - (360 / opts.length)}deg)`;
+
+    const span = document.createElement("span");
+
+    span.textContent = opt;
+
+    span.style.transform = `rotate(${-(360 / opts.length) * i}deg)`;
+
+    seg.appendChild(span);
+
+    wheelElem.appendChild(seg);
+
+  });
+
+
+
+  // Secret double-click toggle
+
+  wheelElem.ondblclick = () => {
+
+    wheels[key].riggedMode = !wheels[key].riggedMode;
+
+    console.log(`${key.toUpperCase()} wheel: ` + 
+
+      (wheels[key].riggedMode ? "💘 Rigged Mode ON" : "🎲 Fair Mode ON"));
+
+  };
+
+});
+
+
+
+// Spin function
+
+function spin(type) {
+
+  const wheelObj = wheels[type];
+
+  const wheelElem = document.getElementById("wheel-" + type);
+
+  const resultElem = document.getElementById("result-" + type);
+
+
+
+  let result;
+
+  if (wheelObj.riggedMode) {
+
+    result = wheelObj.riggedOptions[Math.floor(Math.random() * wheelObj.riggedOptions.length)];
+
+  } else {
+
+    result = wheelObj.options[Math.floor(Math.random() * wheelObj.options.length)];
+
+  }
+
+
+
+  const index = wheelObj.options.indexOf(result);
+
+  const slice = 360 / wheelObj.options.length;
+
+  const randomOffset = Math.random() * slice; 
+
+  const targetAngle = 360 * 5 + (index * slice) + (slice / 2) - randomOffset;
+
+
+
+  wheelElem.style.transform = `rotate(${targetAngle}deg)`;
+
+
+
+  setTimeout(() => {
+
+    resultElem.textContent = result;
+
+  }, 5200);
+
+}
+
+
+
+// Spin all wheels
+
+function spinAll() {
+
+  spin("activity");
+
+  spin("dinner");
+
+  spin("outfits");
+
+}
+
+</script>
+
+
+
+</body>
+
+</html>
+
