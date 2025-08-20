@@ -28,7 +28,6 @@ h1 {
   transform: translateX(-50%);
   text-shadow: 0 0 8px #ff8fa3, 0 0 16px #ff4d6d; /* glowing pink glow */
 }
-If you’re generating a separate pointer per wheel (likely with position: relative on each wheel container), you’ll want this tweak inside that class instead. Example:
 
 .wheel-container {
   position: relative;
