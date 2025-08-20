@@ -13,18 +13,18 @@ const wheels = {
   }
 };
 
-// Build wheels with curved text + gradients + glow
+// Build wheels with curved text, gradients, and glow
 Object.keys(wheels).forEach(key => {
   const wheelElem = document.getElementById("wheel-" + key);
   const opts = wheels[key].options;
   const slice = 360 / opts.length;
-  const radius = 160;
+  const radius = 160; // bigger radius for readable text
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, "svg");
   const defs = document.createElementNS(svgNS, "defs");
   svg.appendChild(defs);
 
-  // soft glow
+  // Center glow
   const glow = document.createElementNS(svgNS, "radialGradient");
   glow.setAttribute("id", `${key}-glow`);
   glow.innerHTML = `
@@ -35,14 +35,17 @@ Object.keys(wheels).forEach(key => {
   defs.appendChild(glow);
 
   opts.forEach((opt, i) => {
+    // Gradient for slice
     const gradId = `${key}-grad-${i}`;
     const grad = document.createElementNS(svgNS, "linearGradient");
     grad.setAttribute("id", gradId);
-    grad.setAttribute("x1", "0%"); grad.setAttribute("y1", "0%");
-    grad.setAttribute("x2", "100%"); grad.setAttribute("y2", "100%");
+    grad.setAttribute("x1", "0%");
+    grad.setAttribute("y1", "0%");
+    grad.setAttribute("x2", "100%");
+    grad.setAttribute("y2", "100%");
     grad.innerHTML = `
-      <stop offset="0%" stop-color="${i % 2 ? '#ff4d6d' : '#ff8095'}" />
-      <stop offset="100%" stop-color="${i % 2 ? '#cc0033' : '#ff99aa'}" />
+      <stop offset="0%" stop-color="${i % 2 ? '#ff4d6d' : '#ff8095'}"/>
+      <stop offset="100%" stop-color="${i % 2 ? '#cc0033' : '#ff99aa'}"/>
     `;
     defs.appendChild(grad);
 
@@ -54,11 +57,13 @@ Object.keys(wheels).forEach(key => {
     const x2 = 150 + radius * Math.cos(Math.PI * endAngle / 180);
     const y2 = 150 + radius * Math.sin(Math.PI * endAngle / 180);
 
+    // Slice path
     const path = document.createElementNS(svgNS, "path");
     path.setAttribute("d", `M150,150 L${x1},${y1} A${radius},${radius} 0 ${largeArc} 1 ${x2},${y2} Z`);
     path.setAttribute("fill", `url(#${gradId})`);
     svg.appendChild(path);
 
+    // Arc path for text
     const arcPath = document.createElementNS(svgNS, "path");
     const arcId = `${key}-arc-${i}`;
     arcPath.setAttribute("id", arcId);
@@ -66,15 +71,17 @@ Object.keys(wheels).forEach(key => {
     arcPath.setAttribute("fill", "none");
     svg.appendChild(arcPath);
 
+    // Curved text
     const text = document.createElementNS(svgNS, "text");
-    text.setAttribute("dy", "-5");
+    text.setAttribute("dy", "-12"); // move text inward
     text.setAttribute("fill", "white");
     text.setAttribute("font-size", "16");
     text.setAttribute("font-weight", "bold");
     text.setAttribute("stroke", "black");
-    text.setAttribute("stroke-width", "1");
+    text.setAttribute("stroke-width", "0.7");
+
     const textPath = document.createElementNS(svgNS, "textPath");
-    textPath.setAttribute("href", `#${arcId}`);
+    textPath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#${arcId}`);
     textPath.setAttribute("startOffset", "50%");
     textPath.setAttribute("text-anchor", "middle");
     textPath.textContent = opt;
@@ -82,23 +89,24 @@ Object.keys(wheels).forEach(key => {
     svg.appendChild(text);
   });
 
-  // glowing circle overlay
+  // Glow circle overlay
   const glowCircle = document.createElementNS(svgNS, "circle");
   glowCircle.setAttribute("cx", "150");
   glowCircle.setAttribute("cy", "150");
-  glowCircle.setAttribute("r", "140");
+  glowCircle.setAttribute("r", radius);
   glowCircle.setAttribute("fill", `url(#${key}-glow)`);
   svg.appendChild(glowCircle);
 
   wheelElem.appendChild(svg);
 
-  // double click toggles rigged mode
+  // Hidden double-click toggle for rigged mode
   wheelElem.ondblclick = () => {
     wheels[key].riggedMode = !wheels[key].riggedMode;
     console.log(`${key} wheel rigged = ${wheels[key].riggedMode}`);
   };
 });
 
+// Spin a single wheel
 function spin(type) {
   const wheelObj = wheels[type];
   const wheelElem = document.getElementById("wheel-" + type);
@@ -114,12 +122,15 @@ function spin(type) {
   const index = wheelObj.options.indexOf(result);
   const slice = 360 / wheelObj.options.length;
 
+  // Rotate the wheel
   wheelObj.rotation += 1800 + (index * slice) + (slice / 2);
   wheelElem.style.transform = `rotate(${wheelObj.rotation}deg)`;
 
+  // Show result after animation
   setTimeout(() => { resultElem.textContent = result; }, 5200);
 }
 
+// Spin all three wheels
 function spinAll() {
   spin("activity");
   spin("dinner");
