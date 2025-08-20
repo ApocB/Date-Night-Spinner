@@ -35,6 +35,8 @@ h1 {
   margin: 0 auto;
   box-shadow: 0 0 40px rgba(255,0,64,0.5);
   overflow: visible;
+  transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+  transform-origin: center center; /* crucial for smooth spinning */
 }
 
 .pointer {
@@ -42,7 +44,7 @@ h1 {
   height: 30px;
   background: crimson;
   position: absolute;
-  top: -60px;
+  top: -15px;
   left: 50%;
   transform: translateX(-50%) rotate(45deg);
   z-index: 10;
