@@ -1,22 +1,32 @@
-function createWheel(key) {
+const wheels = {
+  activity: {
+    options: ["🍿 Movie Night","🎲 Board Games","🌌 Stargazing","🎤 Karaoke","🎮 Video Games","🧑‍🍳 Cook Together"],
+    riggedOptions: ["🌌 Stargazing","🍿 Movie Night"], riggedMode: true, rotation: 0
+  },
+  dinner: {
+    options: ["🍝 Italian","🍣 Sushi","🥩 Steakhouse","🌮 Mexican","🍕 Pizza","🥗 Healthy Bowls"],
+    riggedOptions: ["🍣 Sushi","🍝 Italian"], riggedMode: true, rotation: 0
+  },
+  outfits: {
+    options: ["👕 Casual","👔 Dressy","🎽 Sporty","👗 Fancy","🧥 Cozy","😎 Themed"],
+    riggedOptions: ["👗 Fancy","👔 Dressy"], riggedMode: true, rotation: 0
+  }
+};
+
+// Build wheels with curved text, gradients, and glow
+Object.keys(wheels).forEach(key => {
   const wheelElem = document.getElementById("wheel-" + key);
   const opts = wheels[key].options;
   const slice = 360 / opts.length;
-  const radius = 170; 
+  const radius = 160; // bigger radius for readable text
   const svgNS = "http://www.w3.org/2000/svg";
-
-  // create SVG
   const svg = document.createElementNS(svgNS, "svg");
-  svg.setAttribute("width", "350");
-  svg.setAttribute("height", "350");
-  svg.setAttribute("viewBox", "0 0 350 350");
-
   const defs = document.createElementNS(svgNS, "defs");
   svg.appendChild(defs);
 
-  // radial glow
+  // Center glow
   const glow = document.createElementNS(svgNS, "radialGradient");
-  glow.setAttribute("id", key + "-glow");
+  glow.setAttribute("id", `${key}-glow`);
   glow.innerHTML = `
     <stop offset="0%" stop-color="#ffccd5" stop-opacity="0.9"/>
     <stop offset="70%" stop-color="#ff4d6d" stop-opacity="0.4"/>
@@ -25,7 +35,8 @@ function createWheel(key) {
   defs.appendChild(glow);
 
   opts.forEach((opt, i) => {
-    const gradId = key + "-grad-" + i;
+    // Gradient for slice
+    const gradId = `${key}-grad-${i}`;
     const grad = document.createElementNS(svgNS, "linearGradient");
     grad.setAttribute("id", gradId);
     grad.setAttribute("x1", "0%");
@@ -41,20 +52,18 @@ function createWheel(key) {
     const startAngle = i * slice;
     const endAngle = startAngle + slice;
     const largeArc = slice > 180 ? 1 : 0;
-    const cx = 175, cy = 175;
+    const x1 = 150 + radius * Math.cos(Math.PI * startAngle / 180);
+    const y1 = 150 + radius * Math.sin(Math.PI * startAngle / 180);
+    const x2 = 150 + radius * Math.cos(Math.PI * endAngle / 180);
+    const y2 = 150 + radius * Math.sin(Math.PI * endAngle / 180);
 
-    const x1 = cx + radius * Math.cos(Math.PI * startAngle / 180);
-    const y1 = cy + radius * Math.sin(Math.PI * startAngle / 180);
-    const x2 = cx + radius * Math.cos(Math.PI * endAngle / 180);
-    const y2 = cy + radius * Math.sin(Math.PI * endAngle / 180);
-
-    // slice path
+    // Slice path
     const path = document.createElementNS(svgNS, "path");
-    path.setAttribute("d", `M${cx},${cy} L${x1},${y1} A${radius},${radius} 0 ${largeArc} 1 ${x2},${y2} Z`);
+    path.setAttribute("d", `M150,150 L${x1},${y1} A${radius},${radius} 0 ${largeArc} 1 ${x2},${y2} Z`);
     path.setAttribute("fill", `url(#${gradId})`);
     svg.appendChild(path);
 
-    // text along path
+    // Arc path for text
     const arcPath = document.createElementNS(svgNS, "path");
     const arcId = `${key}-arc-${i}`;
     arcPath.setAttribute("id", arcId);
@@ -62,7 +71,9 @@ function createWheel(key) {
     arcPath.setAttribute("fill", "none");
     svg.appendChild(arcPath);
 
+    // Curved text
     const text = document.createElementNS(svgNS, "text");
+    text.setAttribute("dy", "-12"); // move text inward
     text.setAttribute("fill", "white");
     text.setAttribute("font-size", "16");
     text.setAttribute("font-weight", "bold");
@@ -73,27 +84,55 @@ function createWheel(key) {
     textPath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#${arcId}`);
     textPath.setAttribute("startOffset", "50%");
     textPath.setAttribute("text-anchor", "middle");
-    textPath.setAttribute("dominant-baseline", "middle");
     textPath.textContent = opt;
-
     text.appendChild(textPath);
     svg.appendChild(text);
   });
 
-  // glow circle overlay
+  // Glow circle overlay
   const glowCircle = document.createElementNS(svgNS, "circle");
-  glowCircle.setAttribute("cx", "175");
-  glowCircle.setAttribute("cy", "175");
+  glowCircle.setAttribute("cx", "150");
+  glowCircle.setAttribute("cy", "150");
   glowCircle.setAttribute("r", radius);
   glowCircle.setAttribute("fill", `url(#${key}-glow)`);
   svg.appendChild(glowCircle);
 
-  // attach SVG to container
   wheelElem.appendChild(svg);
 
-  // double-click toggle for rigged mode
+  // Hidden double-click toggle for rigged mode
   wheelElem.ondblclick = () => {
     wheels[key].riggedMode = !wheels[key].riggedMode;
-    console.log(key + " rigged:", wheels[key].riggedMode);
+    console.log(`${key} wheel rigged = ${wheels[key].riggedMode}`);
   };
+});
+
+// Spin a single wheel
+function spin(type) {
+  const wheelObj = wheels[type];
+  const wheelElem = document.getElementById("wheel-" + type);
+  const resultElem = document.getElementById("result-" + type);
+
+  let result;
+  if (wheelObj.riggedMode) {
+    result = wheelObj.riggedOptions[Math.floor(Math.random() * wheelObj.riggedOptions.length)];
+  } else {
+    result = wheelObj.options[Math.floor(Math.random() * wheelObj.options.length)];
+  }
+
+  const index = wheelObj.options.indexOf(result);
+  const slice = 360 / wheelObj.options.length;
+
+  // Rotate the wheel
+  wheelObj.rotation += 1800 + (index * slice) + (slice / 2);
+  wheelElem.style.transform = `rotate(${wheelObj.rotation}deg)`;
+
+  // Show result after animation
+  setTimeout(() => { resultElem.textContent = result; }, 5200);
+}
+
+// Spin all three wheels
+function spinAll() {
+  spin("activity");
+  spin("dinner");
+  spin("outfits");
 }
