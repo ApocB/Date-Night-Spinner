@@ -18,7 +18,7 @@ Object.keys(wheels).forEach(key => {
   const wheelElem = document.getElementById("wheel-" + key);
   const opts = wheels[key].options;
   const slice = 360 / opts.length;
-  const radius = 140;
+  const radius = 160;
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, "svg");
   const defs = document.createElementNS(svgNS, "defs");
@@ -69,8 +69,10 @@ Object.keys(wheels).forEach(key => {
     const text = document.createElementNS(svgNS, "text");
     text.setAttribute("dy", "-5");
     text.setAttribute("fill", "white");
-    text.setAttribute("font-size", "14");
+    text.setAttribute("font-size", "16");
     text.setAttribute("font-weight", "bold");
+    text.setAttribute("stroke", "black");
+    text.setAttribute("stroke-width", "1");
     const textPath = document.createElementNS(svgNS, "textPath");
     textPath.setAttribute("href", `#${arcId}`);
     textPath.setAttribute("startOffset", "50%");
