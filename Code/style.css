@@ -34,7 +34,8 @@ h1 {
   border: 15px solid #ff4d6d;
   margin: 0 auto;
   box-shadow: 0 0 40px rgba(255,0,64,0.5);
-  overflow: visible;
+  overflow: hidden;
+  position: relative;
 }
 
 .pointer {
