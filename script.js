@@ -58,6 +58,7 @@ function createWheel(key) {
     const endAngle = startAngle + slice;
     const largeArc = slice > 180 ? 1 : 0;
 
+    // Wedge path
     const x1 = 175 + outerRadius * Math.cos(Math.PI * startAngle / 180);
     const y1 = 175 + outerRadius * Math.sin(Math.PI * startAngle / 180);
     const x2 = 175 + outerRadius * Math.cos(Math.PI * endAngle / 180);
@@ -68,19 +69,18 @@ function createWheel(key) {
     path.setAttribute("fill", `url(#${gradId})`);
     svg.appendChild(path);
 
-    // TEXT ARC
-    const arcPath = document.createElementNS(svgNS, "path");
+    // Text arc
     const arcX1 = 175 + textRadius * Math.cos(Math.PI * startAngle / 180);
     const arcY1 = 175 + textRadius * Math.sin(Math.PI * startAngle / 180);
     const arcX2 = 175 + textRadius * Math.cos(Math.PI * endAngle / 180);
     const arcY2 = 175 + textRadius * Math.sin(Math.PI * endAngle / 180);
 
+    const arcPath = document.createElementNS(svgNS, "path");
     arcPath.setAttribute("d", `M${arcX1},${arcY1} A${textRadius},${textRadius} 0 ${largeArc} 1 ${arcX2},${arcY2}`);
     arcPath.setAttribute("id", `${key}-text-arc-${i}`);
     arcPath.setAttribute("fill", "none");
     defs.appendChild(arcPath);
 
-    // TEXT
     const text = document.createElementNS(svgNS, "text");
     text.setAttribute("font-size", fontSize);
     text.setAttribute("font-weight", "bold");
@@ -109,29 +109,59 @@ function createWheel(key) {
   };
 }
 
+// Initialize all wheels
 Object.keys(wheels).forEach(createWheel);
 
+// Spin function with live ticker
 function spin(type) {
   const wheelObj = wheels[type];
   const wheelElem = document.getElementById("wheel-" + type);
   const resultElem = document.getElementById("result-" + type);
 
+  const opts = wheelObj.options;
+  const slice = 360 / opts.length;
+
+  // Determine final result
   const result = wheelObj.riggedMode
     ? wheelObj.riggedOptions[Math.floor(Math.random() * wheelObj.riggedOptions.length)]
-    : wheelObj.options[Math.floor(Math.random() * wheelObj.options.length)];
+    : opts[Math.floor(Math.random() * opts.length)];
 
-  const index = wheelObj.options.indexOf(result);
-  const slice = 360 / wheelObj.options.length;
+  const index = opts.indexOf(result);
+  const finalRotation = wheelObj.rotation + 1800 + (index * slice) + (slice / 2);
+  const duration = 5000; // 5 seconds spin
+  const start = performance.now();
+  const startRotation = wheelObj.rotation;
 
-  wheelObj.rotation += 1800 + (index * slice) + (slice / 2);
-  wheelElem.style.transition = "transform 5s cubic-bezier(0.25, 1, 0.5, 1)";
-  wheelElem.style.transform = `rotate(${wheelObj.rotation}deg)`;
+  function animate(time) {
+    let elapsed = time - start;
+    if (elapsed > duration) elapsed = duration;
 
-  setTimeout(() => {
-    resultElem.textContent = result;
-  }, 5200);
+    // Smooth cubic ease-out
+    const t = elapsed / duration;
+    const eased = 1 - Math.pow(1 - t, 3);
+
+    // Current rotation
+    const currentRotation = startRotation + eased * (finalRotation - startRotation);
+    wheelElem.style.transform = `rotate(${currentRotation}deg)`;
+
+    // Calculate current slice under pointer
+    const pointerAngle = 0; // pointer at top
+    let adjustedAngle = (360 - (currentRotation % 360) + pointerAngle) % 360;
+    let currentIndex = Math.floor(adjustedAngle / slice) % opts.length;
+    resultElem.textContent = opts[currentIndex]; // live ticker
+
+    if (elapsed < duration) {
+      requestAnimationFrame(animate);
+    } else {
+      wheelObj.rotation = finalRotation % 360;
+      resultElem.textContent = result; // final selected option
+    }
+  }
+
+  requestAnimationFrame(animate);
 }
 
+// Spin all wheels
 function spinAll() {
   spin("activity");
   spin("dinner");
