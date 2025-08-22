@@ -10,7 +10,7 @@ h1 {
   margin-bottom: 30px;
   font-size: 2.8em;
   color: #ffccd5;
-  text-shadow: 2px 2px 12px #000;
+  text-shadow: 0 0 15px rgba(255, 128, 149, 0.7);
 }
 
 .wheel-container {
@@ -18,60 +18,71 @@ h1 {
   margin: 30px;
   position: relative;
   vertical-align: top;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 20px rgba(255, 77, 109, 0.3);
 }
 
 .wheel-title {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 1.5em;
   color: #ffd6e0;
   font-weight: bold;
+  text-shadow: 0 0 8px rgba(255, 200, 210, 0.5);
 }
 
 .wheel {
   width: 350px;
   height: 350px;
   border-radius: 50%;
-  border: 15px solid #ff4d6d;
+  border: 10px solid #ff8095;
   margin: 0 auto;
-  box-shadow: 0 0 40px rgba(255,0,64,0.5);
+  box-shadow: inset 0 0 25px rgba(0,0,0,0.6),
+              0 0 40px rgba(255, 77, 109, 0.5);
   overflow: visible;
   transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
-  transform-origin: center center; /* crucial for smooth spinning */
+  transform-origin: center center;
 }
 
 .pointer {
-  width: 30px;
-  height: 30px;
-  background: crimson;
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-bottom: 28px solid #ffccd5;
   position: absolute;
-  top: -15px;
+  top: -30px;
   left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  z-index: 10;
-  box-shadow: 0 0 12px rgba(255,0,64,0.7);
-  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  filter: drop-shadow(0 0 6px rgba(255, 200, 210, 0.8));
 }
 
 .spin-btn {
-  margin-top: 15px;
-  padding: 10px 18px;
+  margin-top: 18px;
+  padding: 12px 22px;
   font-size: 16px;
+  font-weight: bold;
   background: linear-gradient(145deg, #ff4d6d, #cc0033);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 30px;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(0,0,0,0.6);
-  transition: 0.3s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  transition: all 0.3s ease;
 }
 
 .spin-btn:hover {
   background: linear-gradient(145deg, #ff8095, #e61a4c);
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.7);
 }
 
 .result {
-  margin-top: 10px;
-  font-size: 18px;
+  margin-top: 12px;
+  font-size: 20px;
   font-weight: bold;
   color: #ffd6e0;
+  text-shadow: 0 0 8px rgba(255, 200, 210, 0.6);
 }
