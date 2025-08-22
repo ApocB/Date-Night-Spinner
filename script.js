@@ -24,8 +24,14 @@ function createWheel(key) {
   const opts = wheels[key].options;
   const slice = 360 / opts.length;
   const outerRadius = 170;
-  const textRadius = 135; // bring text closer to center (was near 170 before)
+  const textRadius = 135;
   const svgNS = "http://www.w3.org/2000/svg";
+
+  // Auto-scale font size
+  let fontSize;
+  if (opts.length <= 5) fontSize = 24;
+  else if (opts.length <= 8) fontSize = 20;
+  else fontSize = 16;
 
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", "350");
@@ -62,9 +68,8 @@ function createWheel(key) {
     path.setAttribute("fill", `url(#${gradId})`);
     svg.appendChild(path);
 
-    // TEXT PATH (curved inside the arc, but closer to center)
+    // TEXT ARC
     const arcPath = document.createElementNS(svgNS, "path");
-    const midAngle = (startAngle + endAngle) / 2;
     const arcX1 = 175 + textRadius * Math.cos(Math.PI * startAngle / 180);
     const arcY1 = 175 + textRadius * Math.sin(Math.PI * startAngle / 180);
     const arcX2 = 175 + textRadius * Math.cos(Math.PI * endAngle / 180);
@@ -75,8 +80,9 @@ function createWheel(key) {
     arcPath.setAttribute("fill", "none");
     defs.appendChild(arcPath);
 
+    // TEXT
     const text = document.createElementNS(svgNS, "text");
-    text.setAttribute("font-size", "20");
+    text.setAttribute("font-size", fontSize);
     text.setAttribute("font-weight", "bold");
     text.setAttribute("fill", "white");
     text.setAttribute("stroke", "black");
@@ -96,7 +102,7 @@ function createWheel(key) {
 
   wheelElem.appendChild(svg);
 
-  // Double click toggles rigged mode
+  // Double-click toggles rigged mode
   wheelElem.ondblclick = () => {
     wheels[key].riggedMode = !wheels[key].riggedMode;
     console.log(key + " rigged:", wheels[key].riggedMode);
