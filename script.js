@@ -24,7 +24,7 @@ function createWheel(key) {
   const opts = wheels[key].options;
   const slice = 360 / opts.length;
   const outerRadius = 170;
-  const textRadius = 130; // smaller inner circle for text
+  const textRadius = 135; // bring text closer to center (was near 170 before)
   const svgNS = "http://www.w3.org/2000/svg";
 
   const svg = document.createElementNS(svgNS, "svg");
@@ -33,16 +33,6 @@ function createWheel(key) {
 
   const defs = document.createElementNS(svgNS, "defs");
   svg.appendChild(defs);
-
-  // Glow gradient
-  const glow = document.createElementNS(svgNS, "radialGradient");
-  glow.setAttribute("id", key + "-glow");
-  glow.innerHTML = `
-    <stop offset="0%" stop-color="#ffccd5" stop-opacity="0.9"/>
-    <stop offset="70%" stop-color="#ff4d6d" stop-opacity="0.4"/>
-    <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-  `;
-  defs.appendChild(glow);
 
   opts.forEach((opt, i) => {
     const gradId = `${key}-grad-${i}`;
@@ -62,41 +52,40 @@ function createWheel(key) {
     const endAngle = startAngle + slice;
     const largeArc = slice > 180 ? 1 : 0;
 
-    // Outer slice coordinates
     const x1 = 175 + outerRadius * Math.cos(Math.PI * startAngle / 180);
     const y1 = 175 + outerRadius * Math.sin(Math.PI * startAngle / 180);
     const x2 = 175 + outerRadius * Math.cos(Math.PI * endAngle / 180);
     const y2 = 175 + outerRadius * Math.sin(Math.PI * endAngle / 180);
 
-    // Slice path
     const path = document.createElementNS(svgNS, "path");
     path.setAttribute("d", `M175,175 L${x1},${y1} A${outerRadius},${outerRadius} 0 ${largeArc} 1 ${x2},${y2} Z`);
     path.setAttribute("fill", `url(#${gradId})`);
     svg.appendChild(path);
 
-    // Inner arc for text
-    const tx1 = 175 + textRadius * Math.cos(Math.PI * startAngle / 180);
-    const ty1 = 175 + textRadius * Math.sin(Math.PI * startAngle / 180);
-    const tx2 = 175 + textRadius * Math.cos(Math.PI * endAngle / 180);
-    const ty2 = 175 + textRadius * Math.sin(Math.PI * endAngle / 180);
-
+    // TEXT PATH (curved inside the arc, but closer to center)
     const arcPath = document.createElementNS(svgNS, "path");
-    const arcId = `${key}-arc-${i}`;
-    arcPath.setAttribute("id", arcId);
-    arcPath.setAttribute("d", `M${tx1},${ty1} A${textRadius},${textRadius} 0 ${largeArc} 1 ${tx2},${ty2}`);
-    arcPath.setAttribute("fill", "none");
-    svg.appendChild(arcPath);
+    const midAngle = (startAngle + endAngle) / 2;
+    const arcX1 = 175 + textRadius * Math.cos(Math.PI * startAngle / 180);
+    const arcY1 = 175 + textRadius * Math.sin(Math.PI * startAngle / 180);
+    const arcX2 = 175 + textRadius * Math.cos(Math.PI * endAngle / 180);
+    const arcY2 = 175 + textRadius * Math.sin(Math.PI * endAngle / 180);
 
-    // Curved text
+    arcPath.setAttribute("d", `M${arcX1},${arcY1} A${textRadius},${textRadius} 0 ${largeArc} 1 ${arcX2},${arcY2}`);
+    arcPath.setAttribute("id", `${key}-text-arc-${i}`);
+    arcPath.setAttribute("fill", "none");
+    defs.appendChild(arcPath);
+
     const text = document.createElementNS(svgNS, "text");
-    text.setAttribute("fill", "white");
     text.setAttribute("font-size", "20");
     text.setAttribute("font-weight", "bold");
+    text.setAttribute("fill", "white");
     text.setAttribute("stroke", "black");
-    text.setAttribute("stroke-width", "1.5");
+    text.setAttribute("stroke-width", "3");
+    text.setAttribute("paint-order", "stroke fill");
+    text.setAttribute("style", "filter: drop-shadow(0px 0px 4px rgba(0,0,0,0.8))");
 
     const textPath = document.createElementNS(svgNS, "textPath");
-    textPath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#${arcId}`);
+    textPath.setAttribute("href", `#${key}-text-arc-${i}`);
     textPath.setAttribute("startOffset", "50%");
     textPath.setAttribute("text-anchor", "middle");
     textPath.textContent = opt;
@@ -105,24 +94,15 @@ function createWheel(key) {
     svg.appendChild(text);
   });
 
-  // Glow overlay
-  const glowCircle = document.createElementNS(svgNS, "circle");
-  glowCircle.setAttribute("cx", "175");
-  glowCircle.setAttribute("cy", "175");
-  glowCircle.setAttribute("r", outerRadius);
-  glowCircle.setAttribute("fill", `url(#${key}-glow)`);
-  svg.appendChild(glowCircle);
-
   wheelElem.appendChild(svg);
 
-  // Toggle rigged mode with double-click
+  // Double click toggles rigged mode
   wheelElem.ondblclick = () => {
     wheels[key].riggedMode = !wheels[key].riggedMode;
     console.log(key + " rigged:", wheels[key].riggedMode);
   };
 }
 
-// Build wheels
 Object.keys(wheels).forEach(createWheel);
 
 function spin(type) {
@@ -130,7 +110,6 @@ function spin(type) {
   const wheelElem = document.getElementById("wheel-" + type);
   const resultElem = document.getElementById("result-" + type);
 
-  // Pick rigged or random option
   const result = wheelObj.riggedMode
     ? wheelObj.riggedOptions[Math.floor(Math.random() * wheelObj.riggedOptions.length)]
     : wheelObj.options[Math.floor(Math.random() * wheelObj.options.length)];
@@ -138,7 +117,6 @@ function spin(type) {
   const index = wheelObj.options.indexOf(result);
   const slice = 360 / wheelObj.options.length;
 
-  // Add multiple full rotations for realism
   wheelObj.rotation += 1800 + (index * slice) + (slice / 2);
   wheelElem.style.transition = "transform 5s cubic-bezier(0.25, 1, 0.5, 1)";
   wheelElem.style.transform = `rotate(${wheelObj.rotation}deg)`;
